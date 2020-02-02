@@ -42,12 +42,8 @@ class SVG:
                 pygame.quit()
                 exit()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    if self.mainMenu.active:
-                        pygame.quit()
-                        exit()
-                    else:
-                        self.mainMenu.active = True
+                if not self.mainMenu.active and event.key == pygame.K_ESCAPE:
+                    self.mainMenu.active = True
         self.keys.update(events)
         if self.mainMenu.active:
             self.mainMenu.events(events)
@@ -66,13 +62,19 @@ class SVG:
         for sprite in self.sprites:
             if sprite.alive:
                 sprite.update(sprite)
-            elif len(sprite.projectiles) == 0:
+                if sprite.y > 768:
+                    sprite.y = 0
+                if self.player.alive and self.player.hitbox.colliderect(sprite.hitbox):
+                    self.player = die(self.player)
+                    sprite = die(sprite)
+            elif len(sprite.projectiles) == 0 and sprite.iter > 180:
                 self.sprites.remove(sprite)
         if self.player.alive:
-            self.player.update(self.player, keys)
+            self.player.update(self.player, self.keys, self.sprites)
 
 class drawable:
     def init(self, sprite, x, y):
+        self.__name__ = sprite.__name__
         self.polygons = []
         self.colors = []
         self.sizes = []
@@ -82,6 +84,7 @@ class drawable:
             self.sizes.append(poly['size'])
         self.alive = True
         self.update = sprite.update
+        self.hitbox = pygame.Rect((0,0),(0,0))
         self.x = x
         self.y = y
 
@@ -91,13 +94,23 @@ class drawable:
                 polygon = []
                 for point in self.polygons[i]:
                     polygon.append((self.x+point[0], self.y+point[1]))
-                pygame.draw.polygon(surface, self.colors[i],
-                    polygon, self.sizes[i])
+                if i == 0: # TODO: Doing; REKT
+                    rect = pygame.draw.polygon(surface, self.colors[i],
+                        polygon, self.sizes[i])
+                    self.hitbox = rect
+                else:
+                    pygame.draw.polygon(surface, self.colors[i],
+                        polygon, self.sizes[i])
 
 class sprite(drawable):
     def __init__(self, sprite, x, y):
         self.init(sprite, x, y)
-        self.hitbox = sprite.hitbox
+        if not sprite.__name__ == 'player':
+            self.startx = x
+            self.starty = y
+            self.deltax = 0
+            self.deltay = 0
+            sprite.init(self)
         self.projectiles = []
 
 class projectile(drawable):

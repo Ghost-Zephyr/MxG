@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from msg import *
 try:
     import pygame
     #from pygame.locals import *
@@ -10,20 +11,22 @@ except ImportError as err:
 
 loadSprites = [
     {
-        's': player,
+        's': flipper,
         'x': width/2,
-        'y': height-75
+        'y': 10
     }
 ]
+
 sprites = []
 for s in loadSprites:
     sprites.append(sprite(
         s['s'], s['x'], s['y']
     ))
+player = sprite(player, width/2, height-75)
 
 keys = utils.keys()
 
-def update(sprites, events):
+def update(sprites, events, player):
     for event in events:
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -34,14 +37,23 @@ def update(sprites, events):
                 exit()
     keys.update(events)
     for sprite in sprites:
-        sprite.update(sprite, keys)
+        sprite.update(sprite)
+        if sprite.y > 768:
+            sprite.y = 0
+        if player.alive and player.hitbox.colliderect(sprite.hitbox):
+            player = utils.die(player)
+            sprite = utils.die(sprite)
+    player.update(player, keys)
+    return player
 
 def draw(surface, sprites):
     for sprite in sprites:
         sprite.draw(surface)
+    player.draw(surface)
 
-def main():
+def main(player):
     pygame.init()
+    pygame.mouse.set_visible(False)
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption('MxG: Spriter')
     surface = pygame.Surface(screen.get_size())
@@ -52,9 +64,9 @@ def main():
     try:
         clock = pygame.time.Clock()
         while 'testing sprites':
-            clock.tick(60)
+            clock.tick(120)
             surface.fill((0, 0, 0))
-            update(sprites, pygame.event.get())
+            player = update(sprites, pygame.event.get(), player)
             draw(surface, sprites)
             screen.blit(surface, (0, 0))
             pygame.display.flip()
@@ -62,5 +74,5 @@ def main():
         print('\nlol\nstopping spriter sprite tester')
 
 if __name__ == '__main__':
-    main()
+    main(player)
 

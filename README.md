@@ -12,11 +12,12 @@ containting most of the game's functions and
 objects.
 
 
-## Possible updates:
+## Possible future updates:
 - After game is in a playable state, add levels and maybe different modes.
-- Player sprite point modification in update func.
+- (Player) sprite point modification in update func.
+- Global highscores with pythonanywhere after score and local highscores.
 
 ## TODO:
 - See if pygame Rects can be used as hitboxes, will be a plus for possible sprite point modification later.
 - Make gfx stuff until game is playable.
-
+- Cool explotion on death and background.

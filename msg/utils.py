@@ -1,3 +1,5 @@
+from .svg import sprite
+from gfx import explosion
 import pygame
 
 width, height = 1024, 768
@@ -9,6 +11,9 @@ def text(msg, surface, centerpos, color=(250, 250, 250), size=24, font=None):
     textpos.centerx = centerpos['x']
     textpos.centery = centerpos['y']
     surface.blit(text, textpos)
+
+def die(dead):
+    return sprite(explosion, dead.x, dead.y)
 
 class keys(object):
     def __init__(self):

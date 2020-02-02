@@ -1,4 +1,3 @@
-from msg import width
 
 class player:
     template = [{
@@ -6,9 +5,9 @@ class player:
         'size': 2,
         'points': [ # Yellow body
             (0,20),
-            (-40,4),(-48,-20),(-36,-4),
+            (-40,4),(-46,-16),(-36,-4),
             (0,4),
-            (36,-4),(48,-20),(40,4)
+            (36,-4),(46,-16),(40,4)
         ]
     },{
         'color': (221, 59, 37),
@@ -20,15 +19,15 @@ class player:
             (34,-7),(53,-28),(43,7)
         ]
     }]
-    hitbox = template[0]
     def update(player, keys):
-        xdelta = 0
-        for key in keys.down:
-            if key in ('a', 'left'):
-                if player.x > 0:
-                    xdelta = -3
-            if key in ('d', 'right'):
-                if player.x < width:
-                    xdelta = 3
-        player.x += xdelta
+        if player.alive:
+            xdelta = 0
+            for key in keys.down:
+                if key in ('a', 'left'):
+                    if player.x > 0:
+                        xdelta = -3
+                if key in ('d', 'right'):
+                    if player.x < 1024:
+                        xdelta = 3
+            player.x += xdelta
 
