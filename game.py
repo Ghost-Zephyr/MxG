@@ -24,7 +24,7 @@ def main():
     try:
         svg = msg.SVG()
         clock = pygame.time.Clock()
-        while 'spillet er bra!':
+        while 'spillet er bra':
             clock.tick(60)
             surface.fill((0, 0, 0))
             svg.eventsAndDraw(surface, pygame.event.get())

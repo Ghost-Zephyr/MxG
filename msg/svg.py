@@ -83,12 +83,13 @@ class sprite(object):
         self.y = y
 
     def draw(self, surface):
-        for i in range(len(self.polygons)):
-            polygon = []
-            for point in self.polygons[i]:
-                polygon.append((self.x+point[0], self.y+point[1]))
-            pygame.draw.polygon(surface, self.colors[i],
-                polygon, self.sizes[i])
+        if self.alive:
+            for i in range(len(self.polygons)):
+                polygon = []
+                for point in self.polygons[i]:
+                    polygon.append((self.x+point[0], self.y+point[1]))
+                pygame.draw.polygon(surface, self.colors[i],
+                    polygon, self.sizes[i])
 
 # --- Fun ---
 rndcolor = lambda rgb: (
