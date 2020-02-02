@@ -3,13 +3,14 @@ try:
     import pygame
     #from pygame.locals import *
     from msg import *
+    from gfx import *
 except ImportError as err:
     print(f'\nMissing module!\n{err}')
     exit()
 
 loadSprites = [
     {
-        's': sprites.player,
+        's': player,
         'x': width/2,
         'y': height-75
     }
@@ -20,7 +21,7 @@ for s in loadSprites:
         s['s'], s['x'], s['y']
     ))
 
-keys = keys()
+keys = utils.keys()
 
 def update(sprites, events):
     for event in events:

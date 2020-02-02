@@ -13,5 +13,10 @@ objects.
 
 
 ## Possible updates:
+- After game is in a playable state, add levels and maybe different modes.
 - Player sprite point modification in update func.
+
+## TODO:
+- See if pygame Rects can be used as hitboxes, will be a plus for possible sprite point modification later.
+- Make gfx stuff until game is playable.
 

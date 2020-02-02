@@ -22,12 +22,13 @@ def main():
     pygame.display.flip()
     # Spill loop
     try:
-        svg = msg.SVG()
+        game = msg.SVG()
+        #msg.init()
         clock = pygame.time.Clock()
         while 'spillet er bra':
             clock.tick(60)
             surface.fill((0, 0, 0))
-            svg.eventsAndDraw(surface, pygame.event.get())
+            game.eventsUpdatesAndDraw(surface, pygame.event.get())
             screen.blit(surface, (0, 0))
             pygame.display.flip()
     except KeyboardInterrupt:

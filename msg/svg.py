@@ -1,11 +1,11 @@
 from random import randint, uniform
 from math import floor, pi
 from .menu import menu
-from .sprites import *
 from .utils import *
+from gfx import *
 import pygame
 
-class SVG(object):
+class SVG:
     def __init__(self):
         self.keys = keys()
         self.mainMenu = menu({
@@ -36,7 +36,7 @@ class SVG(object):
             self.started = True
         self.mainMenu.active = False
 
-    def eventsAndDraw(self, surface, events):
+    def eventsUpdatesAndDraw(self, surface, events):
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -49,7 +49,6 @@ class SVG(object):
                     else:
                         self.mainMenu.active = True
         self.keys.update(events)
-
         if self.mainMenu.active:
             self.mainMenu.events(events)
             text('MxG, not TxK', surface, {'x':width/2,'y':175}, (225, 75, 225), 60)
@@ -65,11 +64,15 @@ class SVG(object):
 
     def update(self, keys):
         for sprite in self.sprites:
-            sprite.update(sprite)
-        self.player.update(self.player, keys)
+            if sprite.alive:
+                sprite.update(sprite)
+            elif len(sprite.projectiles) == 0:
+                self.sprites.remove(sprite)
+        if self.player.alive:
+            self.player.update(self.player, keys)
 
-class sprite(object):
-    def __init__(self, sprite, x, y):
+class drawable:
+    def init(self, sprite, x, y):
         self.polygons = []
         self.colors = []
         self.sizes = []
@@ -90,6 +93,16 @@ class sprite(object):
                     polygon.append((self.x+point[0], self.y+point[1]))
                 pygame.draw.polygon(surface, self.colors[i],
                     polygon, self.sizes[i])
+
+class sprite(drawable):
+    def __init__(self, sprite, x, y):
+        self.init(sprite, x, y)
+        self.hitbox = sprite.hitbox
+        self.projectiles = []
+
+class projectile(drawable):
+    def __init__(self, sprite, x, y):
+        self.init(sprite, x, y)
 
 # --- Fun ---
 rndcolor = lambda rgb: (

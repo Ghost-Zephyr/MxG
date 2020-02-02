@@ -1,4 +1,4 @@
-from . import width
+from msg import width
 
 class player:
     template = [{
@@ -20,6 +20,7 @@ class player:
             (34,-7),(53,-28),(43,7)
         ]
     }]
+    hitbox = template[0]
     def update(player, keys):
         xdelta = 0
         for key in keys.down:
@@ -31,38 +32,3 @@ class player:
                     xdelta = 3
         player.x += xdelta
 
-
-'''
-class flipper:
-    template = [{
-        'color': (250, 250, 250),
-        'size': 2,
-        'points': [
-                [(,)],
-                [(,)],
-                [(,)]
-        ]
-    }]
-
-class fighter:
-    template = [{
-        'color': (250, 250, 250),
-        'size': 2,
-        'points': [
-                [(,)],
-                [(,)],
-                [(,)]
-        ]
-    }]
-
-class bomber:
-    template = [{
-        'color': (250, 250, 250),
-        'size': 2,
-        'points': [
-                [(,)],
-                [(,)],
-                [(,)]
-        ]
-    }]
-'''
