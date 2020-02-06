@@ -9,10 +9,13 @@ except ImportError as err:
 def main():
     # Init
     pygame.init()
+    pygame.mouse.set_visible(False)
     screen = pygame.display.set_mode((msg.width, msg.height))
     pygame.display.set_caption('MxG: Mæhd Space Game, not TxK')
-    # Fyll bakgrunn
+    # Fyll bakgrunn og lag overflater
+    background = pygame.Surface(screen.get_size())
     surface = pygame.Surface(screen.get_size())
+    background = surface.convert()
     surface = surface.convert()
     surface.fill((0, 0, 0))
     msg.loadingarchs(surface)
@@ -26,9 +29,12 @@ def main():
         #msg.init()
         clock = pygame.time.Clock()
         while 'spillet er bra':
-            clock.tick(60)
+            clock.tick(120)
+            #background.fill((0, 0, 0))
             surface.fill((0, 0, 0))
+            msg.drawbg(surface)
             game.eventsUpdatesAndDraw(surface, pygame.event.get())
+            #background.blit(surface, (0, 0))
             screen.blit(surface, (0, 0))
             pygame.display.flip()
     except KeyboardInterrupt:

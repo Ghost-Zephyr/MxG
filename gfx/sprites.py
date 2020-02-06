@@ -1,7 +1,8 @@
 
 class flipper:
     template = [{
-        'color': (79, 2, 137),
+        #'color': (79, 2, 137),
+        'color': (250,0,250),
         'size': 2,
         'points': [
                 (0,0),
@@ -12,14 +13,15 @@ class flipper:
     def init(flipper):
         flipper.deltax = 1
     def update(flipper):
-        flipper.y += 3
-        if flipper.x > flipper.startx-350:
+        flipper.y += 1
+        if flipper.x > flipper.startx-50:
             if flipper.deltax > -10:
                 flipper.deltax -= 1
-        if flipper.x < flipper.startx+350:
+        if flipper.x < flipper.startx+50:
             if flipper.deltax < 10:
                 flipper.deltax += 1
         flipper.x += flipper.deltax
+
 
 ''',{
         'color': (239, 31, 211),

@@ -13,7 +13,10 @@ def text(msg, surface, centerpos, color=(250, 250, 250), size=24, font=None):
     surface.blit(text, textpos)
 
 def die(dead):
-    return sprite(explosion, dead.x, dead.y)
+    exp = sprite(explosion, dead.x, dead.y,
+        oldhitbox=dead.hitbox, projectiles=dead.projectiles)
+    exp.alive = False
+    return exp
 
 class keys(object):
     def __init__(self):

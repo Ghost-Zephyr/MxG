@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-from msg import *
 try:
     import pygame
     #from pygame.locals import *
     from msg import *
+    from msg import sprite as nsprite
     from gfx import *
 except ImportError as err:
     print(f'\nMissing module!\n{err}')
@@ -18,11 +18,12 @@ loadSprites = [
 ]
 
 sprites = []
+explosions = []
 for s in loadSprites:
-    sprites.append(sprite(
+    sprites.append(nsprite(
         s['s'], s['x'], s['y']
     ))
-player = sprite(player, width/2, height-75)
+player = nsprite(player, width/2, height-75)
 
 keys = utils.keys()
 
@@ -42,21 +43,40 @@ def update(sprites, events, player):
             sprite.y = 0
         if player.alive and player.hitbox.colliderect(sprite.hitbox):
             player = utils.die(player)
-            sprite = utils.die(sprite)
-    player.update(player, keys)
+            sprites[sprites.index(sprite)] = utils.die(sprite)
+        if sprite.explodeing:
+            if sprite.iter > sprite.maxiter:
+                sprites.remove(sprite)
+    for projectile in player.projectiles:
+        projectile.update(projectile)
+        for sprite in sprites:
+            if sprite.alive and projectile.hitbox.colliderect(sprite.hitbox):
+                sprites[sprites.index(sprite)] = utils.die(sprite)
+    if player.explodeing:
+        if player.iter > player.maxiter:
+            player.explodeing = False
+    if player.alive or player.explodeing:
+        player.update(player, keys)
     return player
 
-def draw(surface, sprites):
+def draw(surface, sprites, player):
     for sprite in sprites:
         sprite.draw(surface)
-    player.draw(surface)
+    for projectile in player.projectiles:
+        projectile.draw(surface)
+    if player.alive or player.explodeing:
+        player.draw(surface)
+    else:
+        utils.text('DED', surface,
+            {'x':350, 'y':250}, (200, 200, 200), 48)
 
 def main(player):
     pygame.init()
-    pygame.mouse.set_visible(False)
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption('MxG: Spriter')
+    background = pygame.Surface(screen.get_size())
     surface = pygame.Surface(screen.get_size())
+    background = surface.convert()
     surface = surface.convert()
     surface.fill((0, 0, 0))
     screen.blit(surface, (0, 0))
@@ -65,9 +85,12 @@ def main(player):
         clock = pygame.time.Clock()
         while 'testing sprites':
             clock.tick(120)
+            background.fill((0, 0, 0))
             surface.fill((0, 0, 0))
+            drawbg(background)
+            surface.blit(background, (0, 0))
             player = update(sprites, pygame.event.get(), player)
-            draw(surface, sprites)
+            draw(surface, sprites, player)
             screen.blit(surface, (0, 0))
             pygame.display.flip()
     except KeyboardInterrupt:

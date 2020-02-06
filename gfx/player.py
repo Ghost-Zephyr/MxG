@@ -1,3 +1,6 @@
+#from msg import projectile
+from .projectiles import *
+import msg
 
 class player:
     template = [{
@@ -19,15 +22,34 @@ class player:
             (34,-7),(53,-28),(43,7)
         ]
     }]
+    def init(player):
+        player.lastshot = 0
+        player.shotiter = 0
     def update(player, keys):
         if player.alive:
             xdelta = 0
             for key in keys.down:
                 if key in ('a', 'left'):
-                    if player.x > 0:
-                        xdelta = -3
+                    xdelta = -3
                 if key in ('d', 'right'):
-                    if player.x < 1024:
-                        xdelta = 3
+                    xdelta = 3
+                if 'space' in key and player.shotiter == 0:
+                    if player.lastshot == 0:
+                        x = player.x - 43
+                        player.lastshot = 1
+                    else:
+                        x = player.x + 43
+                        player.lastshot = 0
+                    player.projectiles.append(
+                        msg.projectile(laser, x, player.y-28))
+                    player.shotiter = 1
+            if player.shotiter > 0:
+                player.shotiter += 1
+                if player.shotiter > 40:
+                    player.shotiter = 0
+            if player.x < -50:
+                player.x = 1024+50
+            if player.x > 1024+50:
+                player.x = -50
             player.x += xdelta
 

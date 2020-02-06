@@ -3,7 +3,7 @@ from .sprites import *
 
 class explosion:
     template = [{
-        'color': (250, 250, 137),
+        'color': (250, 250, 250),
         'size': 2,
         'points': [
                 (0,0),
@@ -13,6 +13,7 @@ class explosion:
     }]
     def init(exp):
         exp.alive = False
+        exp.explodeing = True
         exp.iter = 0
     def update(exp, *args):
         col = exp.colors[0]

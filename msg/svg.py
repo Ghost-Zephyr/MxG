@@ -1,13 +1,15 @@
 from random import randint, uniform
 from math import floor, pi
 from .menu import menu
-from .utils import *
+from . import utils
 from gfx import *
 import pygame
 
+width, height = 1024, 768
+
 class SVG:
     def __init__(self):
-        self.keys = keys()
+        self.keys = utils.keys()
         self.mainMenu = menu({
             'Start': {
                 'heightdelta': 25,
@@ -24,6 +26,7 @@ class SVG:
         }, ['Start', 'Quit'], 0)
         self.started = False
         self.player = sprite(player, width/2, height-75)
+        self.explosions = []
         self.sprites = []
 
     def start(self):
@@ -47,7 +50,7 @@ class SVG:
         self.keys.update(events)
         if self.mainMenu.active:
             self.mainMenu.events(events)
-            text('MxG, not TxK', surface, {'x':width/2,'y':175}, (225, 75, 225), 60)
+            utils.text('MxG, not TxK', surface, {'x':width/2,'y':175}, (225, 75, 225), 60)
             self.mainMenu.draw(surface, (width/2, height/2))
         else:
             self.update(self.keys)
@@ -56,24 +59,45 @@ class SVG:
     def draw(self, surface):
         for sprite in self.sprites:
             sprite.draw(surface)
-        self.player.draw(surface)
+        for projectile in self.player.projectiles:
+            projectile.draw(surface)
+        if self.player.alive or self.player.explodeing:
+            self.player.draw(surface)
 
     def update(self, keys):
+        self.spawner()
         for sprite in self.sprites:
-            if sprite.alive:
-                sprite.update(sprite)
-                if sprite.y > 768:
-                    sprite.y = 0
-                if self.player.alive and self.player.hitbox.colliderect(sprite.hitbox):
-                    self.player = die(self.player)
-                    sprite = die(sprite)
-            elif len(sprite.projectiles) == 0 and sprite.iter > 180:
-                self.sprites.remove(sprite)
-        if self.player.alive:
-            self.player.update(self.player, self.keys, self.sprites)
+            sprite.update(sprite)
+            if sprite.y > 768:
+                sprite.y = 0
+            if self.player.alive and sprite.hitbox.colliderect(self.player.hitbox):
+                self.player = utils.die(self.player)
+                self.sprites[self.sprites.index(sprite)] = utils.die(sprite)
+            if sprite.explodeing:
+                if sprite.iter > sprite.maxiter:
+                    self.sprites.remove(sprite)
+        for projectile in self.player.projectiles:
+            projectile.update(projectile)
+            for sprite in self.sprites:
+                if sprite.alive and projectile.hitbox.colliderect(sprite.hitbox):
+                    self.sprites[self.sprites.index(sprite)] = utils.die(sprite)
+        if self.player.explodeing:
+            if self.player.iter > self.player.maxiter:
+                self.player.explodeing = False
+        if self.player.alive or self.player.explodeing:
+            self.player.update(self.player, self.keys)
+
+    def spawner(self):
+        chance = 100
+        if len(self.sprites) > 0:
+            chance = floor(
+                100 / len(self.sprites*3)
+            )-1
+        if randint(0,99) < chance:
+            self.sprites.append(sprite(flipper, randint(0, width), 0))
 
 class drawable:
-    def init(self, sprite, x, y):
+    def init(self, sprite, x, y, kwargs):
         self.__name__ = sprite.__name__
         self.polygons = []
         self.colors = []
@@ -83,39 +107,48 @@ class drawable:
             self.colors.append(poly['color'])
             self.sizes.append(poly['size'])
         self.alive = True
+        self.explodeing = False
         self.update = sprite.update
-        self.hitbox = pygame.Rect((0,0),(0,0))
+        try:
+            self.hitbox = kwargs['oldhitbox']
+            self.projectiles = kwargs['projectiles']
+            self.maxiter = 249
+        except:
+            self.hitbox = pygame.Rect((0,0),(0,0))
         self.x = x
         self.y = y
 
     def draw(self, surface):
-        if self.alive:
-            for i in range(len(self.polygons)):
-                polygon = []
-                for point in self.polygons[i]:
-                    polygon.append((self.x+point[0], self.y+point[1]))
-                if i == 0: # TODO: Doing; REKT
-                    rect = pygame.draw.polygon(surface, self.colors[i],
-                        polygon, self.sizes[i])
-                    self.hitbox = rect
-                else:
-                    pygame.draw.polygon(surface, self.colors[i],
-                        polygon, self.sizes[i])
+        for i in range(len(self.polygons)):
+            polygon = []
+            for point in self.polygons[i]:
+                polygon.append((self.x+point[0], self.y+point[1]))
+            if i == 0:
+                self.hitbox = pygame.draw.polygon(surface, self.colors[i],
+                    polygon, self.sizes[i]) # Function returns pygame Rect
+            else:
+                pygame.draw.polygon(surface, self.colors[i],
+                    polygon, self.sizes[i])
 
 class sprite(drawable):
-    def __init__(self, sprite, x, y):
-        self.init(sprite, x, y)
+    def __init__(self, sprite, x, y, **kwargs):
+        self.init(sprite, x, y, kwargs)
         if not sprite.__name__ == 'player':
             self.startx = x
             self.starty = y
             self.deltax = 0
             self.deltay = 0
-            sprite.init(self)
-        self.projectiles = []
+        sprite.init(self)
+        if len(kwargs) < 1:
+            self.projectiles = []
 
 class projectile(drawable):
     def __init__(self, sprite, x, y):
-        self.init(sprite, x, y)
+        self.init(sprite, x, y, {})
+
+
+def drawbg(surface):
+    pygame.draw.polygon(surface, (250,250,250), [(100,100),(50,150),(100,200),(150,150)], 2)
 
 # --- Fun ---
 rndcolor = lambda rgb: (
@@ -130,6 +163,7 @@ def loadingarchs(surface):
         'gm': 75, 'gx': 150,
         'bm': 125, 'bx': 175
     }
+    width, height = 1024, 768
     arcrectgen = lambda: [
         randint(floor(width/10), floor(width/6)),
         randint(floor(height/10), floor(height/6)),
