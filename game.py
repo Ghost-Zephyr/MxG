@@ -32,7 +32,8 @@ def main():
             clock.tick(120)
             #background.fill((0, 0, 0))
             surface.fill((0, 0, 0))
-            msg.drawbg(surface)
+            if game.started:
+                msg.drawbg(surface)
             game.eventsUpdatesAndDraw(surface, pygame.event.get())
             #background.blit(surface, (0, 0))
             screen.blit(surface, (0, 0))

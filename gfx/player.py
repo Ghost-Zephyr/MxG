@@ -23,16 +23,21 @@ class player:
         ]
     }]
     def init(player):
+        player.xdelta = 0
         player.lastshot = 0
         player.shotiter = 0
+        player.speediter = 0
+        player.leftpadding = 0
+        player.rightpadding = 0
+        player.lastpoly = player.polygons
     def update(player, keys):
         if player.alive:
-            xdelta = 0
+            startdelta = player.xdelta
             for key in keys.down:
-                if key in ('a', 'left'):
-                    xdelta = -3
-                if key in ('d', 'right'):
-                    xdelta = 3
+                if key in ('a', 'left') and player.xdelta > -4:
+                    player.xdelta += -1
+                elif key in ('d', 'right') and player.xdelta < 4:
+                    player.xdelta += 1
                 if 'space' in key and player.shotiter == 0:
                     if player.lastshot == 0:
                         x = player.x - 43
@@ -43,6 +48,13 @@ class player:
                     player.projectiles.append(
                         msg.projectile(laser, x, player.y-28))
                     player.shotiter = 1
+            if player.xdelta == startdelta and player.speediter > 14:
+                if player.xdelta < 0:
+                    player.xdelta += 1
+                if player.xdelta > 0:
+                    player.xdelta += -1
+                player.speediter = 0
+            player.speediter += 1
             if player.shotiter > 0:
                 player.shotiter += 1
                 if player.shotiter > 40:
@@ -51,5 +63,5 @@ class player:
                 player.x = 1024+50
             if player.x > 1024+50:
                 player.x = -50
-            player.x += xdelta
+            player.x += player.xdelta
 

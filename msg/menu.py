@@ -18,22 +18,17 @@ class menu(object):
                     'y': whc[1]-self.entries[entry]['heightdelta']
                 },
                 color,
-                self.entries[entry]['size']
-            )
+                self.entries[entry]['size'])
 
     def events(self, events):
         for event in events:
             if event.type == KEYDOWN:
                 if key.name(event.key) in ('return', 'space'):
-                    if self.entries[self.entry]['args'] == '':
-                        self.entries[self.entry]['func']()
-                    else:
-                        self.entries[self.entry]['func'](self.entries[self.entry]['args'])
+                    self.entries[self.entry]['func'](self.entries[self.entry]['args'])
 
                 elif key.name(event.key) in ('up', 'w'):
                     try: self.entry = self.order[self.order.index(self.entry)+1]
                     except IndexError: self.entry = self.order[0]
-
                 elif key.name(event.key) in ('down', 's', 'tab'):
                     try: self.entry = self.order[self.order.index(self.entry)-1]
                     except IndexError: self.entry = self.order[len(self.order)]

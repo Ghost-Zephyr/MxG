@@ -29,7 +29,7 @@ class SVG:
         self.explosions = []
         self.sprites = []
 
-    def start(self):
+    def start(self, *args):
         if not self.started:
             entry = self.mainMenu.entries.pop('Start')
             self.mainMenu.order.remove('Start')
@@ -146,11 +146,10 @@ class projectile(drawable):
     def __init__(self, sprite, x, y):
         self.init(sprite, x, y, {})
 
-
+# --- Fun stuff ---
 def drawbg(surface):
     pygame.draw.polygon(surface, (250,250,250), [(100,100),(50,150),(100,200),(150,150)], 2)
 
-# --- Fun ---
 rndcolor = lambda rgb: (
     randint(rgb['rm'], rgb['rx']),
     randint(rgb['gm'], rgb['gx']),
