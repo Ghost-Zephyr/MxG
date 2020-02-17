@@ -1,5 +1,7 @@
 from random import randint
 
+oneposorneg = lambda x: 1 if x == 1 else -1
+
 class explosion:
     template = [{
         'color': (225, 201, 41),
@@ -33,7 +35,7 @@ class explosion:
 
 class flipper:
     template = [{
-        #'color': (79, 2, 137),
+        #'color': (79, 2, 137), (239, 31, 211)
         'color': (250,0,250),
         'size': 2,
         'points': [
@@ -46,7 +48,6 @@ class flipper:
         flipper.points = 1
         flipper.deltax = 1
     def update(flipper):
-        flipper.y += 1
         if flipper.x > flipper.startx-50:
             if flipper.deltax > -10:
                 flipper.deltax -= 1
@@ -54,31 +55,30 @@ class flipper:
             if flipper.deltax < 10:
                 flipper.deltax += 1
         flipper.x += flipper.deltax
+        flipper.y += 1
 
-
-''',{
-        'color': (239, 31, 211),
-        'size': 2,
-        'points': [
-                (,),
-                (,),
-                (,)
-        ]
-    }'''
-
-'''
-class fighter:
+class bomber:
     template = [{
         'color': (250, 250, 250),
         'size': 2,
         'points': [
-                (,),
-                (,),
-                (,)
+                (0,0),
+                (20,20),
+                (0,40),
+                (-20,20)
         ]
     }]
+    def init(bomber):
+        bomber.points = 6
+        bomber.deltax = oneposorneg(randint(0,1))*randint(1,2)
+    def update(bomber):
+        if randint(0,199) < 1:
+            bomber.deltax = bomber.deltax*-1
+        bomber.x += bomber.deltax
+        bomber.y += 1
 
-class bomber:
+'''
+class fighter:
     template = [{
         'color': (250, 250, 250),
         'size': 2,

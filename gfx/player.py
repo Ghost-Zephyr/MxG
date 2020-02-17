@@ -23,7 +23,6 @@ class player:
         ]
     }]
     def init(player):
-        player.score = 0
         player.xdelta = 0
         player.lastshot = 0
         player.shotiter = 0

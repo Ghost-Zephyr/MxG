@@ -16,13 +16,8 @@ loadSprites = [
         'y': 10
     },
     {
-        's': flipper,
-        'x': width/2+75,
-        'y': 10
-    },
-    {
-        's': flipper,
-        'x': width/2-75,
+        's': bomber,
+        'x': width-75,
         'y': 10
     }
 ]
@@ -50,6 +45,10 @@ def update(sprites, events, player, score):
         sprite.update(sprite)
         if sprite.y > 768:
             sprite.y = 0
+        if sprite.x < -50:
+            sprite.x = 1024+50
+        if sprite.x > 1024+50:
+            sprite.x = -50
         if player.alive and player.hitbox.colliderect(sprite.hitbox):
             player = utils.die(player)
             sprites[sprites.index(sprite)] = utils.die(sprite)
@@ -57,6 +56,8 @@ def update(sprites, events, player, score):
             if sprite.iter > sprite.maxiter:
                 sprites.remove(sprite)
     for projectile in player.projectiles:
+        if projectile.y < 0:
+            player.projectiles.remove(projectile)
         projectile.update(projectile)
         for sprite in sprites:
             if sprite.alive and projectile.hitbox.colliderect(sprite.hitbox):

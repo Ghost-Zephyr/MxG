@@ -91,6 +91,10 @@ class SVG:
             sprite.update(sprite)
             if sprite.y > 768:
                 sprite.y = 0
+            if sprite.x < -50:
+                sprite.x = 1024+50
+            if sprite.x > 1024+50:
+                sprite.x = -50
             if self.player.alive and sprite.hitbox.colliderect(self.player.hitbox):
                 self.player = utils.die(self.player)
                 self.sprites[self.sprites.index(sprite)] = utils.die(sprite)
@@ -98,6 +102,8 @@ class SVG:
                 if sprite.iter > sprite.maxiter:
                     self.sprites.remove(sprite)
         for projectile in self.player.projectiles:
+            if projectile.y < 0:
+                self.player.projectiles.remove(projectile)
             projectile.update(projectile)
             for sprite in self.sprites:
                 if sprite.alive and projectile.hitbox.colliderect(sprite.hitbox):
@@ -116,7 +122,7 @@ class SVG:
                 100 / len(self.sprites*3)
             )-1
         if randint(0,99) < chance:
-            self.sprites.append(sprite(flipper, randint(0, width), 0))
+            self.sprites.append(sprite(bomber, randint(0, width), 0))
 
 class drawable:
     def init(self, sprite, x, y, kwargs):
