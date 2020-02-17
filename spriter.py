@@ -14,6 +14,16 @@ loadSprites = [
         's': flipper,
         'x': width/2,
         'y': 10
+    },
+    {
+        's': flipper,
+        'x': width/2+75,
+        'y': 10
+    },
+    {
+        's': flipper,
+        'x': width/2-75,
+        'y': 10
     }
 ]
 
@@ -24,10 +34,9 @@ for s in loadSprites:
         s['s'], s['x'], s['y']
     ))
 player = nsprite(player, width/2, height-75)
-
 keys = utils.keys()
 
-def update(sprites, events, player):
+def update(sprites, events, player, score):
     for event in events:
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -51,13 +60,14 @@ def update(sprites, events, player):
         projectile.update(projectile)
         for sprite in sprites:
             if sprite.alive and projectile.hitbox.colliderect(sprite.hitbox):
+                score += sprite.points
                 sprites[sprites.index(sprite)] = utils.die(sprite)
     if player.explodeing:
         if player.iter > player.maxiter:
             player.explodeing = False
     if player.alive or player.explodeing:
         player.update(player, keys)
-    return player
+    return player, score
 
 def draw(surface, sprites, player):
     for sprite in sprites:
@@ -70,7 +80,7 @@ def draw(surface, sprites, player):
         utils.text('DED', surface,
             {'x':350, 'y':250}, (200, 200, 200), 48)
 
-def main(player):
+def main(player, score):
     pygame.init()
     screen = pygame.display.set_mode((width, height))
     pygame.display.set_caption('MxG: Spriter')
@@ -87,9 +97,9 @@ def main(player):
             clock.tick(120)
             background.fill((0, 0, 0))
             surface.fill((0, 0, 0))
-            drawbg(background)
+            player, score = update(sprites, pygame.event.get(), player, score)
+            drawbg(background, score)
             surface.blit(background, (0, 0))
-            player = update(sprites, pygame.event.get(), player)
             draw(surface, sprites, player)
             screen.blit(surface, (0, 0))
             pygame.display.flip()
@@ -97,5 +107,5 @@ def main(player):
         print('\nlol\nstopping spriter sprite tester')
 
 if __name__ == '__main__':
-    main(player)
+    main(player, 0)
 

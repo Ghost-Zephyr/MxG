@@ -10,7 +10,7 @@ width, height = 1024, 768
 class SVG:
     def __init__(self):
         self.keys = utils.keys()
-        self.mainMenu = menu({
+        self.mainMenu = menu('MxG, not TxK', {
             'Start': {
                 'heightdelta': 25,
                 'size': 48,
@@ -26,6 +26,7 @@ class SVG:
         }, ['Start', 'Quit'], 0)
         self.started = False
         self.player = sprite(player, width/2, height-75)
+        self.score = 0
         self.explosions = []
         self.sprites = []
 
@@ -39,6 +40,12 @@ class SVG:
             self.started = True
         self.mainMenu.active = False
 
+    def restart(self, *args):
+        keys = self.keys
+        self.__init__()
+        self.keys = keys
+        self.start()
+
     def eventsUpdatesAndDraw(self, surface, events):
         for event in events:
             if event.type == pygame.QUIT:
@@ -50,7 +57,6 @@ class SVG:
         self.keys.update(events)
         if self.mainMenu.active:
             self.mainMenu.events(events)
-            utils.text('MxG, not TxK', surface, {'x':width/2,'y':175}, (225, 75, 225), 60)
             self.mainMenu.draw(surface, (width/2, height/2))
         else:
             self.update(self.keys)
@@ -63,6 +69,21 @@ class SVG:
             projectile.draw(surface)
         if self.player.alive or self.player.explodeing:
             self.player.draw(surface)
+        else:
+            self.mainMenu = menu('Game Over', {
+                'Restart': {
+                    'heightdelta': 25,
+                    'size': 48,
+                    'args': '',
+                    'func': self.restart
+                },
+                'Quit': {
+                    'heightdelta': -25,
+                    'size': 48,
+                    'args': pygame.event.Event(pygame.QUIT),
+                    'func': pygame.event.post
+                }
+            }, ['Restart', 'Quit'], 0)
 
     def update(self, keys):
         self.spawner()
@@ -81,6 +102,7 @@ class SVG:
             for sprite in self.sprites:
                 if sprite.alive and projectile.hitbox.colliderect(sprite.hitbox):
                     self.sprites[self.sprites.index(sprite)] = utils.die(sprite)
+                    self.score += sprite.points
         if self.player.explodeing:
             if self.player.iter > self.player.maxiter:
                 self.player.explodeing = False
@@ -113,10 +135,16 @@ class drawable:
             self.hitbox = kwargs['oldhitbox']
             self.projectiles = kwargs['projectiles']
             self.maxiter = 249
+            self.iter = 0
         except:
             self.hitbox = pygame.Rect((0,0),(0,0))
         self.x = x
         self.y = y
+
+    def addpoly(self, points, color=(250,250,250), size=2):
+        self.polygons.append(points)
+        self.colors.append(color)
+        self.sizes.append(size)
 
     def draw(self, surface):
         for i in range(len(self.polygons)):
@@ -147,8 +175,12 @@ class projectile(drawable):
         self.init(sprite, x, y, {})
 
 # --- Fun stuff ---
-def drawbg(surface):
-    pygame.draw.polygon(surface, (250,250,250), [(100,100),(50,150),(100,200),(150,150)], 2)
+def drawbg(surface, score):
+    pygame.draw.polygon(surface, (250,250,250),
+        [(100,100),(50,150),(100,200),(150,150)], 2)
+
+    utils.text(f'Score: {score}', surface,
+        {'x':100,'y':45}, (225, 75, 225), 48)
 
 rndcolor = lambda rgb: (
     randint(rgb['rm'], rgb['rx']),

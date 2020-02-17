@@ -16,11 +16,9 @@ objects.
 - After game is in a playable state, add levels and maybe different modes.
 - (Player) sprite point modification in update func.
 - Global highscores with pythonanywhere after score and local highscores.
+- Cooler explotion on death.
 
 ## TODO:
-- Score system.
-- Game Over on death, after explotion.
-
-- Make gfx stuff until game is playable.
-- Cool explotion on death and background.
+- Make gfx stuff until game is much better.
+- Cooler background.
 

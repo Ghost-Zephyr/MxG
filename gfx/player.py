@@ -23,13 +23,14 @@ class player:
         ]
     }]
     def init(player):
+        player.score = 0
         player.xdelta = 0
         player.lastshot = 0
         player.shotiter = 0
         player.speediter = 0
-        player.leftpadding = 0
-        player.rightpadding = 0
-        player.lastpoly = player.polygons
+        #player.leftpadding = 0
+        #player.rightpadding = 0
+        #player.lastpoly = player.polygons
     def update(player, keys):
         if player.alive:
             startdelta = player.xdelta
@@ -48,7 +49,7 @@ class player:
                     player.projectiles.append(
                         msg.projectile(laser, x, player.y-28))
                     player.shotiter = 1
-            if player.xdelta == startdelta and player.speediter > 14:
+            if player.xdelta == startdelta and player.speediter > 6:
                 if player.xdelta < 0:
                     player.xdelta += 1
                 if player.xdelta > 0:

@@ -2,13 +2,15 @@ from pygame import *
 from . import utils
 
 class menu(object):
-    def __init__(self, entries, order, activeEntry, active=True):
+    def __init__(self, title, entries, order, activeEntry, active=True):
+        self.title = title
         self.active = active
         self.entry = order[activeEntry]
         self.order = order
         self.entries = entries
 
     def draw(self, surface, whc):
+        utils.text(self.title, surface, {'x':whc[0],'y':175}, (225, 75, 225), 60)
         for entry in self.entries:
             color = (200, 200, 200)
             if entry == self.entry:
