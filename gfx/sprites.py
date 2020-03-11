@@ -1,4 +1,6 @@
+from .projectiles import *
 from random import randint
+import msg
 
 oneposorneg = lambda x: 1 if x == 1 else -1
 
@@ -39,9 +41,10 @@ class flipper:
         'color': (250,0,250),
         'size': 2,
         'points': [
-                (0,0),
-                (20,20),
-                (-20,20)
+            (15,0),
+            (0,-5),
+            (-15,0),
+            (0,25)
         ]
     }]
     def init(flipper):
@@ -62,17 +65,31 @@ class bomber:
         'color': (250, 250, 250),
         'size': 2,
         'points': [
-                (0,0),
-                (20,20),
-                (0,40),
-                (-20,20)
+            (0,0),
+            (20,20),
+            (0,40),
+            (-20,20)
         ]
     }]
     def init(bomber):
         bomber.points = 6
         bomber.deltax = oneposorneg(randint(0,1))*randint(1,2)
     def update(bomber):
-        if randint(0,199) < 1:
+        r = randint(0,199)
+        for projectile in bomber.projectiles:
+            if projectile.__name__ == 'bomb':
+                if projectile.ydelta > 250:
+                    bomber.projectiles.remove(projectile)
+                    for i in range(8):
+                        bomber.projectiles.append(
+                            msg.projectile(shrapnel, projectile.x, projectile.y, i=i))
+            if projectile.__name__ == 'shrapnel':
+                if projectile.iter > 75:
+                    bomber.projectiles.remove(projectile)
+        if r < 1:
+            bomber.projectiles.append(
+                msg.projectile(bomb, bomber.x, bomber.y+25))
+        if r < 1:
             bomber.deltax = bomber.deltax*-1
         bomber.x += bomber.deltax
         bomber.y += 1
@@ -83,9 +100,9 @@ class fighter:
         'color': (250, 250, 250),
         'size': 2,
         'points': [
-                (,),
-                (,),
-                (,)
+            (,),
+            (,),
+            (,)
         ]
     }]
 '''

@@ -1,4 +1,3 @@
-#from msg import projectile
 from .projectiles import *
 import msg
 

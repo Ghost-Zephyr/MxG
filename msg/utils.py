@@ -12,6 +12,11 @@ def text(msg, surface, centerpos, color=(250, 250, 250), size=24, font=None):
     textpos.centery = centerpos['y']
     surface.blit(text, textpos)
 
+def updateprojectile(projectile, sprite):
+    if projectile.y < 0 or projectile.y > height:
+        sprite.projectiles.remove(projectile)
+    projectile.update(projectile)
+
 def die(dead):
     exp = sprite(explosion, dead.x, dead.y,
         oldhitbox=dead.hitbox, projectiles=dead.projectiles)

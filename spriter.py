@@ -11,13 +11,18 @@ except ImportError as err:
 
 loadSprites = [
     {
-        's': flipper,
+        's': bomber,
         'x': width/2,
         'y': 10
     },
     {
         's': bomber,
         'x': width-75,
+        'y': 10
+    },
+    {
+        's': bomber,
+        'x': width+75,
         'y': 10
     }
 ]
@@ -43,6 +48,10 @@ def update(sprites, events, player, score):
     keys.update(events)
     for sprite in sprites:
         sprite.update(sprite)
+        for projectile in sprite.projectiles:
+            utils.updateprojectile(projectile, sprite)
+            if projectile.hitbox.colliderect(player.hitbox):
+                player = utils.die(player)
         if sprite.y > 768:
             sprite.y = 0
         if sprite.x < -50:
@@ -53,12 +62,10 @@ def update(sprites, events, player, score):
             player = utils.die(player)
             sprites[sprites.index(sprite)] = utils.die(sprite)
         if sprite.explodeing:
-            if sprite.iter > sprite.maxiter:
+            if sprite.iter > sprite.maxiter and len(sprite.projectiles) == 0:
                 sprites.remove(sprite)
     for projectile in player.projectiles:
-        if projectile.y < 0:
-            player.projectiles.remove(projectile)
-        projectile.update(projectile)
+        utils.updateprojectile(projectile, player)
         for sprite in sprites:
             if sprite.alive and projectile.hitbox.colliderect(sprite.hitbox):
                 score += sprite.points
@@ -72,7 +79,10 @@ def update(sprites, events, player, score):
 
 def draw(surface, sprites, player):
     for sprite in sprites:
-        sprite.draw(surface)
+        if not sprite.explodeing or sprite.iter < sprite.maxiter:
+            sprite.draw(surface)
+        for projectile in sprite.projectiles:
+            projectile.draw(surface)
     for projectile in player.projectiles:
         projectile.draw(surface)
     if player.alive or player.explodeing:

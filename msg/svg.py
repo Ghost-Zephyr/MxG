@@ -64,7 +64,10 @@ class SVG:
 
     def draw(self, surface):
         for sprite in self.sprites:
-            sprite.draw(surface)
+            if not sprite.explodeing or sprite.iter < sprite.maxiter:
+                sprite.draw(surface)
+            for projectile in sprite.projectiles:
+                projectile.draw(surface)
         for projectile in self.player.projectiles:
             projectile.draw(surface)
         if self.player.alive or self.player.explodeing:
@@ -89,6 +92,10 @@ class SVG:
         self.spawner()
         for sprite in self.sprites:
             sprite.update(sprite)
+            for projectile in sprite.projectiles:
+                utils.updateprojectile(projectile, sprite)
+                if projectile.hitbox.colliderect(self.player.hitbox):
+                    self.player = utils.die(self.player)
             if sprite.y > 768:
                 sprite.y = 0
             if sprite.x < -50:
@@ -99,12 +106,10 @@ class SVG:
                 self.player = utils.die(self.player)
                 self.sprites[self.sprites.index(sprite)] = utils.die(sprite)
             if sprite.explodeing:
-                if sprite.iter > sprite.maxiter:
+                if sprite.iter > sprite.maxiter and len(sprite.projectiles) == 0:
                     self.sprites.remove(sprite)
         for projectile in self.player.projectiles:
-            if projectile.y < 0:
-                self.player.projectiles.remove(projectile)
-            projectile.update(projectile)
+            utils.updateprojectile(projectile, self.player)
             for sprite in self.sprites:
                 if sprite.alive and projectile.hitbox.colliderect(sprite.hitbox):
                     self.sprites[self.sprites.index(sprite)] = utils.die(sprite)
@@ -115,14 +120,16 @@ class SVG:
         if self.player.alive or self.player.explodeing:
             self.player.update(self.player, self.keys)
 
-    def spawner(self):
-        chance = 100
-        if len(self.sprites) > 0:
-            chance = floor(
-                100 / len(self.sprites*3)
-            )-1
-        if randint(0,99) < chance:
-            self.sprites.append(sprite(bomber, randint(0, width), 0))
+    def spawner(self, maxi=499):
+        if len(self.sprites) > 2:
+            i = randint(0,maxi)
+            chance = 7
+            if i < chance-floor(chance/3):
+                self.sprites.append(sprite(flipper, randint(0, width), 0))
+            elif i < chance:
+                self.sprites.append(sprite(bomber, randint(0, width), 0))
+        else:
+            self.sprites.append(sprite(flipper, randint(0, width), 0))
 
 class drawable:
     def init(self, sprite, x, y, kwargs):
@@ -177,8 +184,12 @@ class sprite(drawable):
             self.projectiles = []
 
 class projectile(drawable):
-    def __init__(self, sprite, x, y):
-        self.init(sprite, x, y, {})
+    def __init__(self, projectile, x, y, **kwargs):
+        self.init(projectile, x, y, {})
+        if len(kwargs) > 0:
+            projectile.init(self, **kwargs)
+        else:
+            projectile.init(self)
 
 # --- Fun stuff ---
 def drawbg(surface, score):
